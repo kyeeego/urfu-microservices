@@ -1,0 +1,33 @@
+package http
+
+import (
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+func (h *Handler) HandleGetById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, map[string]error{"error": err})
+		return
+	}
+
+	model, err := h.services.Product.GetById(uint(id))
+	if err != nil {
+		c.JSON(404, map[string]error{"error": err})
+		return
+	}
+
+	c.JSON(200, model)
+}
+
+func (h *Handler) HandleGet(c *gin.Context) {
+	models, err := h.services.Product.Get()
+	if err != nil {
+		c.JSON(404, map[string]error{"error": err})
+		return
+	}
+
+	c.JSON(200, models)
+}

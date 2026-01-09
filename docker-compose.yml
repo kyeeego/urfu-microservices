@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    build: product-service
+    container_name: product_service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      - PG_HOST=products_postgres
+      - PG_USER=admin
+      - PG_PASS=admin
+      - PG_PORT=5432
+      - PG_NAME=products
+      - PORT=8081
+
+  db:
+    image: 'postgres:latest'
+    container_name: products_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=products
