@@ -33,6 +33,23 @@ services:
       - PG_NAME=orders
       - PORT=8082
 
+  users:
+    build: user-service
+    container_name: user_service
+    ports:
+      - "8083:8083"
+    depends_on:
+      orders_postgres:
+        condition: service_healthy
+    environment:
+      - PG_HOST=users_postgres
+      - PG_USER=postgres
+      - PG_PASS=admin
+      - PG_PORT=5432
+      - PG_NAME=users
+      - JWT_KEY=X2xlNHA3eW1sJCdrelZfXTwjJGZfcyd2MQ==
+      - PORT=8083
+
   products_postgres:
     image: 'postgres:17-alpine'
     container_name: products_postgres
@@ -67,6 +84,24 @@ services:
     volumes: 
       - ./ordersdata:/var/lib/postgresql/data/
 
+  users_postgres:
+    image: 'postgres:17-alpine'
+    container_name: users_postgres
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=users
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    volumes: 
+      - ./usersdata:/var/lib/postgresql/data/
+
 volumes:
   productsdata:
   ordersdata:
+  usersdata:
