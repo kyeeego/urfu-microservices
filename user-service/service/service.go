@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kyeeego/urfu-microservices/user-service/domain"
 	"github.com/kyeeego/urfu-microservices/user-service/pkg/jwt"
 	"github.com/kyeeego/urfu-microservices/user-service/repository"
 )
 
 type UserService interface {
 	Register(username string, password string) error
+	GetById(id uint) (domain.UserDto, error)
 }
 
 type AuthService interface {

@@ -17,6 +17,10 @@ func (s OrderServiceImpl) GetById(id uint) (domain.Order, error) {
 	return s.repository.Order.GetById(id)
 }
 
+func (s OrderServiceImpl) GetByUserId(id uint) ([]domain.Order, error) {
+	return s.repository.Order.GetByUserId(id)
+}
+
 func (s OrderServiceImpl) Get() ([]domain.Order, error) {
 	return s.repository.Order.Get()
 }

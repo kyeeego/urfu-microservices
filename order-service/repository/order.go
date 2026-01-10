@@ -20,6 +20,13 @@ func (r orderRepository) Get() ([]domain.Order, error) {
 	return orders, res.Error
 }
 
+func (r orderRepository) GetByUserId(id uint) ([]domain.Order, error) {
+	var orders []domain.Order
+	res := r.db.Preload("Products").Find(&orders, domain.Order{UserID: id})
+
+	return orders, res.Error
+}
+
 func (r orderRepository) GetById(id uint) (domain.Order, error) {
 	order := domain.Order{}
 	res := r.db.Preload("Products").First(&order, id)

@@ -8,6 +8,7 @@ import (
 type OrderService interface {
 	Get() ([]domain.Order, error)
 	GetById(id uint) (domain.Order, error)
+	GetByUserId(id uint) ([]domain.Order, error)
 }
 
 type Service struct {

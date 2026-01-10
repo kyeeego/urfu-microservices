@@ -34,3 +34,12 @@ func (s UserServiceImpl) Register(username string, pass string) error {
 
 	return s.repository.User.Insert(&model)
 }
+
+func (s UserServiceImpl) GetById(id uint) (domain.UserDto, error) {
+	model, err := s.repository.User.GetById(id)
+	if err != nil {
+		return domain.UserDto{}, err
+	}
+
+	return domain.UserDto{ID: model.ID, Username: model.Username}, nil
+}

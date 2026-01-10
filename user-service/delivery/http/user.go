@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -60,4 +61,20 @@ func (h *Handler) HandleAuthorize(c *gin.Context) {
 	}
 
 	c.JSON(200, map[string]string{"username": username})
+}
+
+func (h *Handler) HandleGet(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, map[string]error{"error": err})
+		return
+	}
+
+	dto, err := h.services.User.GetById(uint(id))
+	if err != nil {
+		c.JSON(404, map[string]error{"error": err})
+		return
+	}
+
+	c.JSON(200, dto)
 }

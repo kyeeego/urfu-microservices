@@ -50,6 +50,21 @@ services:
       - JWT_KEY=X2xlNHA3eW1sJCdrelZfXTwjJGZfcyd2MQ==
       - PORT=8083
 
+  gateway:
+    build: gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - users
+      - orders
+      - products
+    environment:
+      - PRODUCTS_URL=http://products:8081
+      - ORDERS_URL=http://orders:8082
+      - USERS_URL=http://users:8083
+      - PORT=8080
+
   products_postgres:
     image: 'postgres:17-alpine'
     container_name: products_postgres

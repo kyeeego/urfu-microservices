@@ -26,5 +26,6 @@ func (h *Handler) initApi(router *gin.Engine) {
 	{
 		a.GET("/", h.HandleGet)
 		a.GET("/:id", h.HandleGetById)
+		a.GET("/user/:id", h.HandleGetByUserId)
 	}
 }
