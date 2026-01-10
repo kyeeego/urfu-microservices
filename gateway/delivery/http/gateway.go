@@ -3,8 +3,10 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/kyeeego/urfu-microservices/gateway/domain/dto"
 )
 
@@ -44,6 +46,15 @@ func (h *Handler) HandleLogin(c *gin.Context) {
 
 func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 	id := c.Param("id")
+
+	cached, err := h.redis.Get(id).Result()
+	if err == nil {
+		fmt.Println("Using cached result")
+		c.JSON(200, cached)
+		return
+	} else if err != redis.Nil {
+		fmt.Printf("redis error. proceeding without it: %e\n", err)
+	}
 
 	status, res, err := h.http.Get(fmt.Sprintf("%s/%s", h.cfg.UsersUrl, id), map[string]string{})
 	if err != nil {
@@ -106,6 +117,12 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 		}
 
 		result.Orders = append(result.Orders, res)
+	}
+
+	strRes, _ := json.Marshal(result)
+	err = h.redis.Set(id, strRes, time.Second*time.Duration(h.cfg.RedisTtl)).Err()
+	if err != nil {
+		fmt.Printf("redis error: %e\n", err)
 	}
 
 	c.JSON(200, result)

@@ -2,17 +2,19 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/kyeeego/urfu-microservices/gateway/config"
 	"github.com/kyeeego/urfu-microservices/gateway/delivery/http/clients"
 )
 
 type Handler struct {
-	cfg  *config.Config
-	http clients.HttpClientWithRetry
+	cfg   *config.Config
+	http  clients.HttpClientWithRetry
+	redis *redis.Client
 }
 
-func New(cfg *config.Config, http clients.HttpClientWithRetry) *Handler {
-	return &Handler{cfg, http}
+func New(cfg *config.Config, http clients.HttpClientWithRetry, redis *redis.Client) *Handler {
+	return &Handler{cfg, http, redis}
 }
 
 func (h *Handler) Init() *gin.Engine {
