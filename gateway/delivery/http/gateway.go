@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,15 +12,17 @@ import (
 )
 
 func (h *Handler) HandleRegister(c *gin.Context) {
-	_, res, err := h.http.Post(h.cfg.UsersUrl+"/signup", map[string]string{}, c.Request.Body)
+	status, res, err := h.http.Post(h.cfg.UsersUrl+"/signup", map[string]string{}, c.Request.Body)
 	if err != nil {
-		c.AbortWithStatusJSON(401, map[string]string{"error": err.Error()})
+		slog.Error(fmt.Sprintf("Error while trying to register: %e", err))
+		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
 		return
 	}
 
 	var body dto.RegisterLoginDto
 	err = json.Unmarshal(res, &body)
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to read response: %e", err))
 		c.AbortWithStatusJSON(500, map[string]string{"error": err.Error()})
 		return
 	}
@@ -28,15 +31,17 @@ func (h *Handler) HandleRegister(c *gin.Context) {
 }
 
 func (h *Handler) HandleLogin(c *gin.Context) {
-	_, res, err := h.http.Post(h.cfg.UsersUrl+"/login", map[string]string{}, c.Request.Body)
+	status, res, err := h.http.Post(h.cfg.UsersUrl+"/login", map[string]string{}, c.Request.Body)
 	if err != nil {
-		c.AbortWithStatusJSON(401, map[string]string{"error": err.Error()})
+		slog.Error(fmt.Sprintf("Error while trying to login: %e", err))
+		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
 		return
 	}
 
 	var body dto.TokenDto
 	err = json.Unmarshal(res, &body)
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to read response: %e", err))
 		c.AbortWithStatusJSON(500, map[string]string{"error": err.Error()})
 		return
 	}
@@ -49,15 +54,16 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 
 	cached, err := h.redis.Get(id).Result()
 	if err == nil {
-		fmt.Println("Using cached result")
+		slog.Info("Using cached result")
 		c.JSON(200, cached)
 		return
 	} else if err != redis.Nil {
-		fmt.Printf("redis error. proceeding without it: %e\n", err)
+		slog.Warn(fmt.Sprintf("redis error. proceeding without it: %e\n", err))
 	}
 
 	status, res, err := h.http.Get(fmt.Sprintf("%s/%s", h.cfg.UsersUrl, id), map[string]string{})
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to request user info: %e", err))
 		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
 		return
 	}
@@ -65,12 +71,14 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 	var user dto.UserClientResponse
 	err = json.Unmarshal(res, &user)
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to read response: %e", err))
 		c.AbortWithStatusJSON(500, map[string]string{"error": err.Error()})
 		return
 	}
 
 	status, res, err = h.http.Get(fmt.Sprintf("%s/user/%s", h.cfg.OrdersUrl, id), map[string]string{})
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to request orders info: %e", err))
 		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
 		return
 	}
@@ -78,6 +86,7 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 	var orders []dto.OrderClientResponse
 	err = json.Unmarshal(res, &orders)
 	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to read response: %e", err))
 		c.AbortWithStatusJSON(500, map[string]string{"error": err.Error()})
 		return
 	}
@@ -122,7 +131,7 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 	strRes, _ := json.Marshal(result)
 	err = h.redis.Set(id, strRes, time.Second*time.Duration(h.cfg.RedisTtl)).Err()
 	if err != nil {
-		fmt.Printf("redis error: %e\n", err)
+		slog.Warn(fmt.Sprintf("redis error: %e", err))
 	}
 
 	c.JSON(200, result)

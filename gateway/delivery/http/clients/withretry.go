@@ -3,6 +3,7 @@ package clients
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -29,7 +30,7 @@ func (c *endpointHttpClientImpl) Get(url string, headers map[string]string) (int
 	for range c.attempts {
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Unable to create request. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Unable to create request. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}
@@ -39,7 +40,7 @@ func (c *endpointHttpClientImpl) Get(url string, headers map[string]string) (int
 
 		response, err := c.client.Do(req)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Error while sending request. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Error while sending request. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}
@@ -48,7 +49,7 @@ func (c *endpointHttpClientImpl) Get(url string, headers map[string]string) (int
 
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Error while reading response. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Error while reading response. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}
@@ -65,7 +66,7 @@ func (c *endpointHttpClientImpl) Post(url string, headers map[string]string, bod
 	for range c.attempts {
 		req, err := http.NewRequest(http.MethodPost, url, body)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Unable to create request. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Unable to create request. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}
@@ -75,7 +76,7 @@ func (c *endpointHttpClientImpl) Post(url string, headers map[string]string, bod
 
 		response, err := c.client.Do(req)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Error while sending request. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Error while sending request. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}
@@ -84,7 +85,7 @@ func (c *endpointHttpClientImpl) Post(url string, headers map[string]string, bod
 
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println(fmt.Errorf("Error while reading response. Trying again: %e", err))
+			slog.Error(fmt.Sprintf("Error while reading response. Trying again: %e", err))
 			time.Sleep(c.wait)
 			continue
 		}

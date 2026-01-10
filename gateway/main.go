@@ -1,8 +1,10 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -29,9 +31,12 @@ func main() {
 
 	s := &server.Server{}
 
-	if err := s.Run(conf.Port, handler.Init()); err != nil {
-		log.Fatalf("Got an error while trying to start the server: %e\n", err)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+	if err := s.Run(conf.Port, handler.Init(logger, float64(time.Second)/5, 10)); err != nil {
+		slog.Error(fmt.Sprintf("Got an error while trying to start the server: %e\n", err))
 	} else {
-		log.Printf("Server is active on port :%d\n", conf.Port)
+		slog.Info(fmt.Sprintf("Server is active on port :%d\n", conf.Port))
 	}
 }
