@@ -26,3 +26,7 @@ func (r productRepository) GetById(id uint) (domain.Product, error) {
 
 	return product, res.Error
 }
+
+func (r productRepository) Insert(model *domain.Product) error {
+	return r.db.Create(model).Error
+}

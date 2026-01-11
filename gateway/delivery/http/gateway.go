@@ -1,6 +1,7 @@
 package http
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -135,4 +136,41 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 	}
 
 	c.JSON(200, result)
+}
+
+func (h *Handler) HandleInsertProducts(c *gin.Context) {
+	status, _, err := h.http.Post(h.cfg.ProductsUrl, map[string]string{}, c.Request.Body)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to insert products: %e", err))
+		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
+		return
+	}
+}
+
+func (h *Handler) HandleInsertOrders(c *gin.Context) {
+	var body dto.OrderDto
+	if err := c.BindJSON(&body); err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to insert orders: %e", err))
+		c.AbortWithStatusJSON(400, map[string]string{"error": err.Error()})
+		return
+	}
+
+	req := dto.OrderRequestDro{
+		UserID:   c.GetUint("user_id"),
+		Products: body.Products,
+	}
+
+	reqMarsh, err := json.Marshal(req)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to insert orders: %e", err))
+		c.AbortWithStatusJSON(500, map[string]string{"error": err.Error()})
+		return
+	}
+
+	status, _, err := h.http.Post(h.cfg.OrdersUrl, map[string]string{}, bytes.NewReader(reqMarsh))
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error while trying to login: %e", err))
+		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
+		return
+	}
 }

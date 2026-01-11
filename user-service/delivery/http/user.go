@@ -54,13 +54,13 @@ func (h *Handler) HandleAuthorize(c *gin.Context) {
 	}
 
 	token := a[1]
-	username, err := h.services.Auth.Authorize(token)
+	userId, err := h.services.Auth.Authorize(token)
 	if err != nil {
 		c.JSON(403, errors.New("invalid token"))
 		return
 	}
 
-	c.JSON(200, map[string]string{"username": username})
+	c.JSON(200, map[string]int{"user_id": userId})
 }
 
 func (h *Handler) HandleGet(c *gin.Context) {

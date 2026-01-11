@@ -9,6 +9,8 @@ type OrderRepository interface {
 	Get() ([]domain.Order, error)
 	GetById(id uint) (domain.Order, error)
 	GetByUserId(id uint) ([]domain.Order, error)
+	Insert(*domain.Order) error
+	InsertOrderProducts(*domain.OrderProducts) error
 }
 
 type Repository struct {

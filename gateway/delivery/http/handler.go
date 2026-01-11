@@ -43,5 +43,7 @@ func (h *Handler) initApi(router *gin.Engine) {
 		a.POST("/signup", h.HandleRegister)
 		a.POST("/login", h.HandleLogin)
 		a.GET("/profile/:id", h.JwtAuthorize, h.HandleAggregateProfile)
+		a.POST("/products", h.JwtAuthorize, h.HandleInsertProducts)
+		a.POST("/orders", h.JwtAuthorize, h.HandleInsertOrders)
 	}
 }

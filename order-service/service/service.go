@@ -9,6 +9,7 @@ type OrderService interface {
 	Get() ([]domain.Order, error)
 	GetById(id uint) (domain.Order, error)
 	GetByUserId(id uint) ([]domain.Order, error)
+	Insert(domain.OrderDto) error
 }
 
 type Service struct {

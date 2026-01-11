@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kyeeego/urfu-microservices/product-service/domain"
 )
 
 func (h *Handler) HandleGetById(c *gin.Context) {
@@ -30,4 +31,18 @@ func (h *Handler) HandleGet(c *gin.Context) {
 	}
 
 	c.JSON(200, models)
+}
+
+func (h *Handler) HandleInsert(c *gin.Context) {
+	var body domain.ProductDto
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(400, map[string]string{"error": err.Error()})
+		return
+	}
+
+	err := h.services.Product.Insert(body)
+	if err != nil {
+		c.AbortWithStatusJSON(401, map[string]string{"error": err.Error()})
+		return
+	}
 }

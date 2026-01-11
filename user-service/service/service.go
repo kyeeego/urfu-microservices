@@ -16,7 +16,7 @@ type UserService interface {
 
 type AuthService interface {
 	Login(username, password string) (string, error)
-	Authorize(jwt string) (string, error)
+	Authorize(jwt string) (int, error)
 }
 
 type Service struct {

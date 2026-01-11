@@ -20,3 +20,12 @@ func (s ProductServiceImpl) GetById(id uint) (domain.Product, error) {
 func (s ProductServiceImpl) Get() ([]domain.Product, error) {
 	return s.repository.Product.Get()
 }
+
+func (s ProductServiceImpl) Insert(body domain.ProductDto) error {
+	model := &domain.Product{
+		Name:  body.Name,
+		Price: body.Price,
+	}
+
+	return s.repository.Product.Insert(model)
+}

@@ -8,3 +8,7 @@ type RegisterLoginDto struct {
 type TokenDto struct {
 	Token string `json:"token"`
 }
+
+type AuthorizeDto struct {
+	UserID int `json:""user_id`
+}

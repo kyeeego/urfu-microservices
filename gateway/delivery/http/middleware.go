@@ -1,25 +1,37 @@
 package http
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kyeeego/urfu-microservices/gateway/domain/dto"
 	"golang.org/x/time/rate"
 )
 
 func (h *Handler) JwtAuthorize(c *gin.Context) {
-	status, _, err := h.http.Get(h.cfg.UsersUrl+"/authorize", map[string]string{
+	status, body, err := h.http.Get(h.cfg.UsersUrl+"/authorize", map[string]string{
 		"Authorization": c.GetHeader("Authorization"),
 	})
-
 	if err != nil || status != 200 {
 		slog.Error("request attempt with invalid jwt")
 		c.AbortWithStatusJSON(403, map[string]string{
 			"error": "invalid JWT",
 		})
+		return
 	}
+
+	var authResponse dto.AuthorizeDto
+	err = json.Unmarshal(body, &authResponse)
+	if err != nil {
+		slog.Error("unable to read authorization response")
+		c.AbortWithStatusJSON(500, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	c.Set("user_id", authResponse.UserID)
 }
 
 func SlogLogger(logger *slog.Logger) gin.HandlerFunc {

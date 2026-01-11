@@ -9,8 +9,8 @@ import (
 )
 
 type TokenManager interface {
-	Sign(username string, ttl time.Duration) (string, error)
-	Verify(jwt string) (string, error)
+	Sign(userId int, ttl time.Duration) (string, error)
+	Verify(jwt string) (int, error)
 }
 
 type Manager struct {
@@ -25,16 +25,16 @@ func NewManager(key string) (*Manager, error) {
 	return &Manager{key: key}, nil
 }
 
-func (m *Manager) Sign(username string, ttl time.Duration) (string, error) {
+func (m *Manager) Sign(userId int, ttl time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(ttl).Unix(),
-		"sub": username,
+		"sub": userId,
 	})
 
 	return token.SignedString([]byte(m.key))
 }
 
-func (m *Manager) Verify(accessToken string) (string, error) {
+func (m *Manager) Verify(accessToken string) (int, error) {
 	token, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
@@ -42,13 +42,13 @@ func (m *Manager) Verify(accessToken string) (string, error) {
 		return []byte(m.key), nil
 	})
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", errors.New("Couldn't get user from token")
+		return 0, errors.New("Couldn't get user from token")
 	}
 
-	return claims["sub"].(string), nil
+	return int(claims["sub"].(float64)), err
 }

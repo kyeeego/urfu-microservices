@@ -14,3 +14,13 @@ type OrderProducts struct {
 	ProductID uint `json:"product_id" gorm:"not null"`
 	Quantity  int  `json:"quantity" gorm:"not null"`
 }
+
+type OrderDto struct {
+	UserID   uint               `json:"user_id"`
+	Products []OrderProductsDto `json:"products"`
+}
+
+type OrderProductsDto struct {
+	ProductID uint `json:"product_id"`
+	Quantity  int  `json:"quantity"`
+}

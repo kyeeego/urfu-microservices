@@ -6,6 +6,7 @@ import (
 )
 
 type ProductRepository interface {
+	Insert(*domain.Product) error
 	Get() ([]domain.Product, error)
 	GetById(id uint) (domain.Product, error)
 }

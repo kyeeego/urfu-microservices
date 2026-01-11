@@ -33,3 +33,11 @@ func (r orderRepository) GetById(id uint) (domain.Order, error) {
 
 	return order, res.Error
 }
+
+func (r orderRepository) Insert(model *domain.Order) error {
+	return r.db.Create(model).Error
+}
+
+func (r orderRepository) InsertOrderProducts(products *domain.OrderProducts) error {
+	return r.db.Create(products).Error
+}

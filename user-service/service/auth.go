@@ -31,9 +31,9 @@ func (s *AuthServiceImpl) Login(username, pass string) (string, error) {
 		return "", errors.New("invalid password")
 	}
 
-	return s.tokenManager.Sign(username, time.Hour*24)
+	return s.tokenManager.Sign(int(user.ID), time.Hour*24)
 }
 
-func (s *AuthServiceImpl) Authorize(jwt string) (string, error) {
+func (s *AuthServiceImpl) Authorize(jwt string) (int, error) {
 	return s.tokenManager.Verify(jwt)
 }

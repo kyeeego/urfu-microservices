@@ -6,6 +6,7 @@ import (
 )
 
 type ProductService interface {
+	Insert(domain.ProductDto) error
 	Get() ([]domain.Product, error)
 	GetById(id uint) (domain.Product, error)
 }

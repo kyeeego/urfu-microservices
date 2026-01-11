@@ -27,5 +27,6 @@ func (h *Handler) initApi(router *gin.Engine) {
 		a.GET("/all", h.HandleGet)
 		a.GET("/id/:id", h.HandleGetById)
 		a.GET("/user/:id", h.HandleGetByUserId)
+		a.POST("/", h.HandleInsert)
 	}
 }
