@@ -27,6 +27,6 @@ func (h *Handler) initApi(router *gin.Engine) {
 		a.POST("/signup", h.HandleRegister)
 		a.POST("/login", h.HandleLogin)
 		a.GET("/authorize", h.HandleAuthorize)
-		a.GET("/:id", h.HandleGet)
+		a.GET("/id/:id", h.HandleGet)
 	}
 }

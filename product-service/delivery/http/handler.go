@@ -24,7 +24,7 @@ func (h *Handler) Init() *gin.Engine {
 func (h *Handler) initApi(router *gin.Engine) {
 	a := router.Group("/")
 	{
-		a.GET("/", h.HandleGet)
-		a.GET("/:id", h.HandleGetById)
+		a.GET("/all", h.HandleGet)
+		a.GET("/id/:id", h.HandleGetById)
 	}
 }

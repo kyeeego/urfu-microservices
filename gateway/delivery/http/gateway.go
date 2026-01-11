@@ -61,7 +61,7 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 		slog.Warn(fmt.Sprintf("redis error. proceeding without it: %e\n", err))
 	}
 
-	status, res, err := h.http.Get(fmt.Sprintf("%s/%s", h.cfg.UsersUrl, id), map[string]string{})
+	status, res, err := h.http.Get(fmt.Sprintf("%s/id/%s", h.cfg.UsersUrl, id), map[string]string{})
 	if err != nil {
 		slog.Error(fmt.Sprintf("Error while trying to request user info: %e", err))
 		c.AbortWithStatusJSON(status, map[string]string{"error": err.Error()})
@@ -105,7 +105,7 @@ func (h *Handler) HandleAggregateProfile(c *gin.Context) {
 		}
 
 		for _, product := range order.Products {
-			_, resp, err := h.http.Get(fmt.Sprintf("%s/%d", h.cfg.ProductsUrl, product.ProductID), map[string]string{})
+			_, resp, err := h.http.Get(fmt.Sprintf("%s/id/%d", h.cfg.ProductsUrl, product.ProductID), map[string]string{})
 			if err != nil {
 				continue
 			}

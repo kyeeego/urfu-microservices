@@ -7,6 +7,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/kyeeego/urfu-microservices/gateway/config"
 	"github.com/kyeeego/urfu-microservices/gateway/delivery/http/clients"
+	"github.com/kyeeego/urfu-microservices/gateway/metrics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Handler struct {
@@ -31,6 +33,11 @@ func (h *Handler) Init(logger *slog.Logger, rateLimit float64, rateLimitBurst in
 }
 
 func (h *Handler) initApi(router *gin.Engine) {
+
+	router.Use(metrics.GinMetricsMiddleware("gateway"))
+
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	a := router.Group("/api")
 	{
 		a.POST("/signup", h.HandleRegister)
